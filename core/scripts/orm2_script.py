@@ -1,7 +1,7 @@
 #update and delete query
 from django.contrib.auth.models import User
-from core.models import Restaurant,Rating,Sale
 from django.utils import timezone
+from core.models import Restaurant,Rating,Sale
 from django.db import connection
  
 def run():
@@ -40,6 +40,9 @@ def run():
     # print(restaurant.ratings.all())
     # print(restaurant.delete())
     
+    print(Restaurant.objects.count())
+    print(Rating.objects.count())
+    print(Sale.objects.count())
     
     
     
