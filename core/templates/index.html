@@ -1,11 +1,27 @@
 {% extends "base.html" %} 
 
 {% block content %}
-<form method='POST'>
+{% comment %} <form method='POST'>
      {% csrf_token %}
 
     {{ form.as_p }}
     <button class="btn btn-primary" type "submit" > Submit</button>
-</form>
-
+</form> {% endcomment %}
+{% comment %} {% for rest in rest %}
+for prefetch() {% endcomment %}
+    {% comment %} <p>{{ rest.name }}</p>
+    <ul>
+        {% for rating in rest.ratings.all %}
+        <li>{{ rating.rating }}</li>
+        {% endfor %}
+    </ul>
+    <ul>
+        {% for rating in rest.sales.all %}
+        <li>{{ sale.income }}</li>
+        {% endfor %}
+    </ul> {% endcomment %}
+    
+    {% comment %} {% for rating in ratings %}
+    <p>{{ rating.restaurant.name }} - {{ rating }}</p>
+    {% endfor %} {% endcomment %}
 {% endblock content %}

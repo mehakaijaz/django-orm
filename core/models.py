@@ -9,7 +9,6 @@ def validate_restaurant_name_begins_with_a(value):
     if not value.startswith('a'):
         raise ValidationError('name of the restaurant doesnt start with a')
 
-
 class Restaurant(models.Model):
     class TypeChoices(models.TextChoices):
         INDIAN = 'IN', 'Indian'
@@ -36,6 +35,19 @@ class Restaurant(models.Model):
     def save(self,*args, **kwargs):
         print(self._state.adding)
         super().save(*args, **kwargs)
+
+class Staff(models.Model):
+    name=models.CharField(max_length=128)
+    restaurants=models.ManyToManyField(Restaurant,through="StaffRestaurant")
+    
+    def __str__(self):
+        return self.name
+    
+class StaffRestaurant(models.Model):
+    staff=models.ForeignKey(Staff,on_delete=models.CASCADE)
+    restaurant=models.ForeignKey(Restaurant,on_delete=models.CASCADE)
+    salary=models.FloatField(null=True)
+    
         
 class Rating(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
