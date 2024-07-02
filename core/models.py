@@ -66,3 +66,17 @@ class Sale(models.Model):
     income = models.DecimalField(max_digits=8, decimal_places=2)
     expenditure = models.DecimalField(max_digits=8, decimal_places=2)
     datetime = models.DateTimeField()
+      
+class Product(models.Model):
+    name=models.CharField(max_length=100)
+    num_in_stock=models.PositiveSmallIntegerField(null=True, blank=True)
+    
+    def __str__(self):
+        return self.name
+    
+class Order(models.Model):
+    product=models.ForeignKey(Product, on_delete=models.CASCADE)
+    num_of_items= models.PositiveSmallIntegerField(null=True, blank=True)
+    
+    def __str__(self):
+        return f'{self.num_of_items} * {self.product.name}' 

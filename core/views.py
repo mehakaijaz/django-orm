@@ -1,7 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render ,redirect
 from django.http import HttpResponse
-from core.forms import RatingForm,RestaurantForm
-from core.models import Restaurant,Rating,Sale,StaffRestaurant
+from core.forms import RatingForm,RestaurantForm,ProductOrderForm
+from core.models import *
 from django.db.models import Sum,Prefetch
 from django.utils import timezone
 
@@ -38,3 +38,18 @@ def index(request):
         print(job.staff.name)
     
     return render(request,'index.html')
+
+def orderproduct(request):
+    if request.method=='POST':
+        form=ProductOrderForm(request.POST)
+        if form.is_valid():
+            order=form.save()
+            order.product.num_in_stock -= order.num_of_items
+            order.product.save()
+            return redirect('orderproduct')
+        else:
+            context={'form':form}
+            return render(request,'order.html',context)
+    form=ProductOrderForm()
+    context={'form':form}
+    return render(request,'order.html',context)
