@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator,MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.db.models.functions import Lower
-
+from django.contrib.contenttypes.fields import GenericForeignKey,GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 
 def validate_restaurant_name_begins_with_a(value):
     if not value.startswith('a'):
@@ -19,7 +21,7 @@ class Restaurant(models.Model):
         FASTFOOD = 'FF', 'Fast Food'
         OTHER = 'OT', 'Other'
     
-    name=models.CharField(max_length=100,validators=[validate_restaurant_name_begins_with_a])
+    name=models.CharField(max_length=100,validators=[validate_restaurant_name_begins_with_a],unique=True)
     website=models.URLField(default='')
     date_opened=models.DateField()
     latitude=models.FloatField(validators=[MinValueValidator(-90),MaxValueValidator(90)])
@@ -27,6 +29,8 @@ class Restaurant(models.Model):
     restaurant_type=models.CharField(max_length=2,choices=TypeChoices.choices)
     capacity=models.PositiveSmallIntegerField(null=True,blank=True)
     nickname=models.CharField(max_length=200,null=True,blank=True)
+    comments=GenericRelation("Comment")
+    
     class Meta:
         ordering=[Lower('name')]
     
@@ -56,9 +60,20 @@ class Rating(models.Model):
     rating=models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1),MaxValueValidator(5)] #using validators
     )
+    comments=GenericRelation("Comment")
     
     def __str__(self):
         return f'Rating : {self.rating}'
+    
+    class Meta:
+        constraints=[
+            models.CheckConstraint(
+                name='rating value valid',
+                check=Q(rating__gte=1,rating__lte=5),
+                violation_error_message="Rating invalid: must fall btw 1 and 5"
+                
+            )
+        ]
     
 class Sale(models.Model):
     restaurant = models.ForeignKey(
@@ -80,3 +95,9 @@ class Order(models.Model):
     
     def __str__(self):
         return f'{self.num_of_items} * {self.product.name}' 
+    
+class Comment(models.Model):
+    text=models.TextField()
+    content_type=models.ForeignKey(ContentType,on_delete=models.CASCADE)
+    object_id=models.PositiveSmallIntegerField()
+    content_object=GenericForeignKey("content_type","object_id")
